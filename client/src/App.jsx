@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route} from "react-router-dom"
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import MyAlerts from "./pages/MyAlerts";
+import MyAlerts from "./pages/temp";
 import AddContact from "./pages/AddContact";
 import ViewContacts from "./pages/ViewContacts";
 import Profile from "./pages/Profile"
