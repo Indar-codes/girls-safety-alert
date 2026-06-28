@@ -6,9 +6,12 @@ const alertSchema = new mongoose.Schema({
     },
     location: String,
     message: String,
-    createdAt: {
-        type: Date,
-        default: Date.now
+    status: {
+        type: String,
+        default:"Pending"
     }
+   
+}, {
+    timestamps: true
 });
 module.exports = mongoose.model("Alert",alertSchema);

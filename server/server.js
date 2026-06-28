@@ -105,14 +105,20 @@ app.delete("/user/:id", async(req,res) => {
     res.send("User Deleted");
 });
 app.put("/user/:id",async(req,res) => {
-    await
-    User.findByIdAndUpdate(req.params.id, {
-        name: req.body.name,
-        phone: req.body.phone
-    });
-    res.send("User Updated");
+    try{
+        
+       const user=await User.findByIdAndUpdate(req.params.id, {
+         name: req.body.name,
+         phone: req.body.phone
+     },{new: true});
+    res.json("User");
+    }catch(error){
+        res.status(500).send(error.mesage);
+    }
 });
 app.put("/user/:id/emergency-contact", async(req,res) =>{
+    console.log("ID =",req.params.id);
+    console.log("BODY =",req.body);
     const user = await
     User.findById(req.params.id);
     user.emergencyContacts.push({
@@ -120,6 +126,8 @@ app.put("/user/:id/emergency-contact", async(req,res) =>{
         phone:req.body.phone
     });
     await user.save();
+    console.log("Contacts After Save =",user.emergencyContacts);
+
     res.send("Emergency Contact Added");
 });
 app.get("/profile", auth,async(req,res) =>{
@@ -139,6 +147,9 @@ app.post("/sos", auth, async(req,res) =>{
         });
 
         await alert.save();
+        const user = await User.findById(req.user.userId);
+        console.log("Emergency Contacts");
+        console.log(user.emergencyContacts);
         res.send("SOS Alert Sent");
     }catch(error){
         console.log(error);
@@ -154,6 +165,28 @@ app.get("/my-alerts", auth, async(req,res) => {
         userId: req.user.userId
     });
     res.json(alerts);
+});
+app.put("/alert/:id/resolve", async(req,res) => {
+    console.log("Resolve API Hit");
+    console.log(req.params.id);
+    try {
+        await Alert.findByIdAndUpdate(req.params.id, {
+            status: "Resolved"
+        });
+        res.send("Alert Resolved");
+    }catch(error) {
+        console.log(error);
+        res.status(500).send(error.message);
+    }
+});
+app.delete("/alert/:id", async(req,res) => {
+    try{
+        await Alert.findByIdAndDelete(req.params.id);
+        res.send("Alert Deleted");
+    }catch(error){
+        console.log(error);
+        res.status(500).send(error.message);
+    }
 });
 app.listen(5000,() => {
     console.log("Girls Safety Alert Backend Started");    //server open in port 5000

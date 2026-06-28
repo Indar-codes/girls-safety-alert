@@ -1,0 +1,191 @@
+/* Profile.css */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@600&display=swap');
+
+.profile-shell {
+    --ink: #14213D;
+    --bg: #EDF1F5;
+    --surface: #FFFFFF;
+    --alert: #E63946;
+    --safe: #2A9D8F;
+    --muted: #5C6B85;
+    --line: #D7DEE7;
+
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 32px 16px;
+    background: linear-gradient(160deg, #EDF1F5 0%, #DCE4ED 100%);
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    box-sizing: border-box;
+}
+
+.profile-card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--surface);
+    border-radius: 24px;
+    padding: 32px 28px 36px;
+    box-shadow: 0 20px 50px -10px rgba(20, 33, 61, 0.18);
+    border: 1px solid var(--line);
+    box-sizing: border-box;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.profile-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.profile-heading {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    margin: 0 0 3px;
+}
+
+.profile-subtext {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+}
+
+.profile-stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.profile-stat-card {
+    background: var(--bg);
+    border-radius: 14px;
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.profile-stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.profile-stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: center;
+}
+
+.profile-section {
+    margin-bottom: 26px;
+}
+.profile-section:last-child {
+    margin-bottom: 0;
+}
+
+.profile-section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+}
+
+.profile-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.profile-field-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.profile-field-group input {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+}
+.profile-field-group input::placeholder { color: #9AA6BC; }
+.profile-field-group input:focus {
+    border-color: var(--ink);
+    background: var(--surface);
+}
+
+.profile-save-button {
+    width: 100%;
+    margin-top: 4px;
+    background: var(--safe);
+    color: white;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+.profile-save-button:hover { background: #23867A; }
+.profile-save-button:active { transform: scale(0.98); }
+.profile-save-button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.last-alert-card {
+    background: var(--bg);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.last-alert-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--ink);
+}
+
+.last-alert-row svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--alert);
+    flex-shrink: 0;
+}

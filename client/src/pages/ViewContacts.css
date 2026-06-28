@@ -1,0 +1,138 @@
+/* ViewContacts.css */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap');
+
+.contacts-shell {
+    --ink: #14213D;
+    --bg: #EDF1F5;
+    --surface: #FFFFFF;
+    --alert: #E63946;
+    --safe: #2A9D8F;
+    --muted: #5C6B85;
+    --line: #D7DEE7;
+
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 32px 16px;
+    background: linear-gradient(160deg, #EDF1F5 0%, #DCE4ED 100%);
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    box-sizing: border-box;
+}
+
+.contacts-card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--surface);
+    border-radius: 24px;
+    padding: 32px 28px 36px;
+    box-shadow: 0 20px 50px -10px rgba(20, 33, 61, 0.18);
+    border: 1px solid var(--line);
+    box-sizing: border-box;
+}
+
+.contacts-heading {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+    margin: 0 0 6px;
+}
+
+.contacts-subtext {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 22px;
+}
+
+.contacts-search-wrap {
+    position: relative;
+    margin-bottom: 22px;
+}
+
+.contacts-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    stroke: var(--muted);
+    pointer-events: none;
+}
+
+.contacts-search-input {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 11px 14px 11px 38px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, background 0.2s;
+}
+.contacts-search-input::placeholder { color: #9AA6BC; }
+.contacts-search-input:focus {
+    border-color: var(--ink);
+    background: var(--surface);
+}
+
+.contacts-empty {
+    text-align: center;
+    font-size: 14px;
+    color: var(--muted);
+    padding: 30px 0;
+}
+
+.contacts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.contact-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg);
+    border-radius: 14px;
+    padding: 12px 14px;
+}
+
+.contact-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.contact-name {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--ink);
+}
+
+.contact-phone {
+    font-size: 13px;
+    color: var(--safe);
+    text-decoration: none;
+}
+.contact-phone:hover { text-decoration: underline; }
