@@ -14,7 +14,7 @@ function Login() {
     try {
 
       const res = await axios.post(
-        "http://localhost:5000/login",
+        "https://girls-safety-alert.onrender.com/login",
         {
           phone,
           password

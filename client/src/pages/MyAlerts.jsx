@@ -13,7 +13,7 @@ function MyAlerts() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/my-alerts",
+        "https://girls-safety-alert.onrender.com/my-alerts",
         {
           headers: {
             Authorization: "Bearer " + token
@@ -31,7 +31,7 @@ function MyAlerts() {
   const handleResolve = async (id) => {
     console.log("Resolved Clicked",id);
     try{
-      await axios.put(`http://localhost:5000/alert/${id}/resolve`);
+      await axios.put(`https://girls-safety-alert.onrender.com/alert/${id}/resolve`);
       console.log("API SUccess");
       alert("Alert Resolved");
       fetchAlerts();
@@ -47,7 +47,7 @@ function MyAlerts() {
     const confirmDelete =window.confirm("Are you sure want to delete this alert");
     if(!confirmDelete) return;
     try{
-      await axios.delete(`http://localhost:5000/alert/${id}`);
+      await axios.delete(`https://girls-safety-alert.onrender.com/alert/${id}`);
       alert("Alert Deleted Successfuly");
       fetchAlerts();
     }catch(error) {

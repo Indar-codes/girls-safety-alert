@@ -24,7 +24,7 @@ function Profile() {
             const token = localStorage.getItem("token");
 
             const res = await axios.get(
-                "http://localhost:5000/profile",
+                "https://girls-safety-alert.onrender.com/profile",
                 {
                     headers: {
                         Authorization: "Bearer " + token
@@ -44,7 +44,7 @@ function Profile() {
         try{
             const token = localStorage.getItem("token");
             const res = await axios.get(
-                "http://localhost:5000/my-alerts",
+                "https://girls-safety-alert.onrender.com/my-alerts",
                 {
                     headers: {
                         Authorization:"Bearer " + token
@@ -65,7 +65,7 @@ function Profile() {
         try {
             const token = localStorage.getItem("token");
             await axios.put(
-                `http://localhost:5000/user/${user._id}`,
+                `https://girls-safety-alert.onrender.com/user/${user._id}`,
                 {
                     name: editName,
                     phone: editPhone

@@ -16,7 +16,7 @@ function Register() {
     try {
 
       const res = await axios.post(
-        "http://localhost:5000/register",
+        "https://girls-safety-alert.onrender.com/register",
         {
           name,
           phone,
