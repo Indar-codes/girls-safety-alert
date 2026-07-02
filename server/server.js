@@ -22,6 +22,7 @@ app.get("/users",async(req,res) => {
    res.json(users);
 });
 app.post("/register", async(req,res) => {
+    console.log("REGISTER REQUEST =",req.body);
     try{
         if(!req.body.name|| !req.body.phone || !req.body.password){
             return res.status(400).send("All fields are required");
