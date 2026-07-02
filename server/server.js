@@ -11,7 +11,8 @@ console.log("URI =", process.env.MONGO_URI);
 const app =express(); //creating server
 app.use(express.json()); //understands json data and use in js object
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173",
+    "https://girls-safety-alert-1.onrender.com"],
     credentials: true
 }));
 app.use(express.json());
