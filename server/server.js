@@ -38,6 +38,7 @@ const allowedOrigins = new Set([
   process.env.CLIENT_ORIGIN
 ].filter(Boolean));
 const authAttempts = new Map();
+const sosAttempts = new Map();
 
 function limitAuthAttempts(req, res, next) {
   const now = Date.now();
@@ -164,16 +165,21 @@ app.put("/user/:id", auth, async (req, res) => {
 
 app.post("/emergency-contact", auth, async (req, res) => {
   try {
-    const { name, phone } = req.body || {};
+    const { name, phone, consent } = req.body || {};
     if (
       typeof name !== "string" || name.trim().length < 1 || name.trim().length > 80 ||
-      typeof phone !== "string" || phone.trim().length < 7 || phone.trim().length > 20
+      typeof phone !== "string" || phone.trim().length < 7 || phone.trim().length > 20 ||
+      consent !== true
     ) {
-      return res.status(400).json({ message: "Enter a valid contact name and phone number." });
+      return res.status(400).json({
+        message: "Enter valid contact details and confirm they agreed to receive SOS texts and location."
+      });
     }
     const user = await User.findByIdAndUpdate(
       req.user.userId,
-      { $push: { emergencyContacts: { name: name.trim(), phone: phone.trim() } } },
+      { $push: { emergencyContacts: {
+        name: name.trim(), phone: phone.trim(), consentedAt: new Date()
+      } } },
       { new: true, runValidators: true }
     ).select("_id");
     if (!user) return res.status(404).json({ message: "Profile not found." });
@@ -184,18 +190,135 @@ app.post("/emergency-contact", auth, async (req, res) => {
 });
 
 app.post("/sos", auth, async (req, res) => {
+  let alert;
   try {
     const { location } = req.body || {};
     if (typeof location !== "string" || location.length > 100) {
       return res.status(400).json({ message: "A valid location is required." });
     }
-    await Alert.create({
+
+    const coordinates = location.split(",").map((part) => Number(part.trim()));
+    if (
+      coordinates.length !== 2 || !coordinates.every(Number.isFinite) ||
+      coordinates[0] < -90 || coordinates[0] > 90 ||
+      coordinates[1] < -180 || coordinates[1] > 180
+    ) {
+      return res.status(400).json({ message: "A valid location is required." });
+    }
+
+    const now = Date.now();
+    const previous = sosAttempts.get(req.user.userId);
+    if (previous && previous.resetAt > now && previous.count >= 3) {
+      return res.status(429).json({
+        message: "SOS is temporarily rate limited. If you need immediate help, call 112."
+      });
+    }
+    if (!previous || previous.resetAt <= now) {
+      sosAttempts.set(req.user.userId, { count: 1, resetAt: now + 60_000 });
+    } else {
+      previous.count += 1;
+    }
+
+    const user = await User.findById(req.user.userId)
+      .select("name phone emergencyContacts");
+    if (!user) return res.status(404).json({ message: "Profile not found." });
+
+    alert = await Alert.create({
       userId: req.user.userId,
       location,
       message: "Emergency Alert Triggered"
     });
-    return res.status(201).json({ message: "SOS alert recorded." });
+
+    const optedInContacts = (user.emergencyContacts || []).filter((contact) =>
+      contact.consentedAt && typeof contact.phone === "string"
+    );
+    if (optedInContacts.length === 0) {
+      return res.status(503).json({
+        alertRecorded: true,
+        notificationStatus: "no_eligible_contacts",
+        message: "SOS recorded, but no contacts have opted in to receive texts. Call 112 now if you need immediate help."
+      });
+    }
+
+    const authKey = process.env.MSG91_AUTHKEY;
+    const templateId = process.env.MSG91_SOS_TEMPLATE_ID;
+    if (!authKey || !templateId) {
+      return res.status(503).json({
+        alertRecorded: true,
+        notificationStatus: "not_configured",
+        message: "SOS recorded, but text alerts are not configured yet. Call 112 now if you need immediate help."
+      });
+    }
+
+    const mapUrl = "https://maps.google.com/?q=" + coordinates[0] + "," + coordinates[1];
+    const recipients = [];
+    const seenNumbers = new Set();
+    for (const contact of optedInContacts) {
+      const digits = contact.phone.replace(/\D/g, "");
+      const mobile = digits.length === 10 ? "91" + digits
+        : digits.length === 12 && digits.startsWith("91") ? digits
+        : null;
+      if (mobile && !seenNumbers.has(mobile)) {
+        seenNumbers.add(mobile);
+        recipients.push({
+          mobiles: mobile,
+          VAR1: String(user.name).slice(0, 80),
+          VAR2: mapUrl,
+          VAR3: String(user.phone).slice(0, 20)
+        });
+      }
+    }
+    if (recipients.length === 0) {
+      return res.status(503).json({
+        alertRecorded: true,
+        notificationStatus: "no_valid_contacts",
+        message: "SOS recorded, but no valid Indian mobile numbers were found. Call 112 now if you need immediate help."
+      });
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    let providerResponse;
+    try {
+      providerResponse = await fetch("https://control.msg91.com/api/v5/flow", {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          authkey: authKey,
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          template_id: templateId,
+          short_url: "0",
+          realTimeResponse: "1",
+          recipients
+        }),
+        signal: controller.signal
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
+    const providerResult = await providerResponse.json().catch(() => ({}));
+    if (!providerResponse.ok || providerResult.type !== "success") {
+      return res.status(502).json({
+        alertRecorded: true,
+        notificationStatus: "failed",
+        message: "SOS recorded, but texts could not be submitted. Call 112 now if you need immediate help."
+      });
+    }
+    return res.status(201).json({
+      alertRecorded: true,
+      notificationStatus: "submitted",
+      message: "SOS submitted to the SMS provider. Delivery can take time; call 112 for immediate help."
+    });
   } catch (_error) {
+    if (alert) {
+      return res.status(502).json({
+        alertRecorded: true,
+        notificationStatus: "failed",
+        message: "SOS recorded, but texts could not be submitted. Call 112 now if you need immediate help."
+      });
+    }
     return res.status(500).json({ message: "Unable to record SOS alert." });
   }
 });
