@@ -146,8 +146,6 @@ function Dashboard() {
             });
             const location = position.coords.latitude + "," + position.coords.longitude;
 
-            console.log("TOKEN =", token);
-
             const res = await axios.post(
                 "https://girls-safety-alert.onrender.com/sos",
                 {location: location},
@@ -159,16 +157,13 @@ function Dashboard() {
             );
             setIsEmergency(true);
             setShowResolve(true);
-            alert("SOS Alert Sent");
-            console.log(res.data);
-
+            alert(res.data.message || "SOS submitted.");
         } catch (error) {
-
-            console.log("FULL ERROR =", error);
-            console.log("RESPONSE =", error.response);
-            console.log("MESSAGE =", error.message);
-
-            alert(error.message);
+            if (error.response?.data?.alertRecorded) {
+                setIsEmergency(true);
+                setShowResolve(true);
+            }
+            alert(error.response?.data?.message || "Unable to send SOS alert. Call 112 for immediate help.");
         }
     };
     const handleProfile = async () => {
@@ -184,10 +179,9 @@ function Dashboard() {
         }
         );
 
-        console.log(res.data);
         alert("Profile Loaded");
-     } catch (error) {
-        console.log(error);
+     } catch (_error) {
+        alert("Unable to load your profile right now.");
      }
      };
      useEffect(()=> {
@@ -209,8 +203,8 @@ function Dashboard() {
             setContactCount(
                 res.data.emergencyContacts.length
             );
-        }catch(error){
-            console.log(error);
+        }catch(_error){
+            setName("");
         }
      };
      const fetchAlerts = async() => {
@@ -220,13 +214,13 @@ function Dashboard() {
                 "https://girls-safety-alert.onrender.com/my-alerts",
                 {
                     headers: {
-                        Authorization: "Bearee " + token
+                        Authorization: "Bearer " + token
                     }
                 }
             );
             setAlertCount(res.data.length);
-        } catch(error) {
-            console.log(error);
+        } catch(_error) {
+            setAlertCount(0);
         }
      };
 
