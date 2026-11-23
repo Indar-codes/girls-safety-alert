@@ -5,18 +5,24 @@ import "./AddContact.css";
 function AddContact() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [consent, setConsent] = useState(false);
+  const [message, setMessage] = useState("");
 
   const handleAddContact = async () => {
+    setMessage("");
     try {
       const token = localStorage.getItem("token");
       await axios.post(
         "https://girls-safety-alert.onrender.com/emergency-contact",
-        { name, phone },
+        { name, phone, consent },
         { headers: { Authorization: "Bearer " + token } }
       );
-      alert("Contact Added Successfully");
+      setMessage("Contact added. They can receive your SOS text and location.");
+      setName("");
+      setPhone("");
+      setConsent(false);
     } catch (error) {
-      alert(error.response?.data?.message || "Unable to add contact.");
+      setMessage(error.response?.data?.message || "Unable to add contact.");
     }
   };
 
@@ -33,18 +39,24 @@ function AddContact() {
           </span>
         </div>
         <h2 className="contact-heading">Add Emergency Contact</h2>
-        <p className="contact-subtext">They'll be notified if you ever send an SOS alert</p>
+        <p className="contact-subtext">Only add someone who agreed to receive emergency texts and your location.</p>
         <div className="contact-field-group">
           <label htmlFor="contactName">Name</label>
           <input id="contactName" type="text" placeholder="Name" value={name}
-            onChange={(e) => setName(e.target.value)} />
+            onChange={(event) => setName(event.target.value)} />
         </div>
         <div className="contact-field-group">
           <label htmlFor="contactPhone">Phone</label>
-          <input id="contactPhone" type="text" placeholder="Phone" value={phone}
-            onChange={(e) => setPhone(e.target.value)} />
+          <input id="contactPhone" type="tel" inputMode="tel" autoComplete="tel" placeholder="10-digit Indian mobile" value={phone}
+            onChange={(event) => setPhone(event.target.value)} />
         </div>
-        <button className="contact-submit-button" onClick={handleAddContact}>
+        <label style={{display:"flex", gap:"0.6rem", alignItems:"flex-start", margin:"1rem 0", textAlign:"left"}}>
+          <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
+          <span>I have their permission to send SOS texts and share my location with them.</span>
+        </label>
+        {message && <p role="status">{message}</p>}
+        <button className="contact-submit-button" onClick={handleAddContact}
+          disabled={!consent || !name.trim() || !phone.trim()}>
           Add Contact
         </button>
       </div>
